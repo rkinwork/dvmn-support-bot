@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  bot:
+    image: dvmn-support-bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/src
+    env_file:
+      - .env
+    command:
+      - "python"
+      - "/src/main.py"
+
+
+
+
+
