@@ -59,4 +59,5 @@ celerybeat-schedule
 
 #project specific
 setup.cfg
+credentials.json
 .venv
