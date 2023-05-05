@@ -1,4 +1,6 @@
+import json
 import logging
+import pathlib
 
 import configargparse
 from google.cloud import dialogflow
@@ -50,6 +52,11 @@ def parse_args():
         help='debug mode',
         action='store_true',
         env_var='DVMN_BOT__DEBUG',
+    )
+    parser.add_argument(
+        '--train-bot',
+        help='run script in train mode. And terminate program',
+        action='store_true',
     )
     parser.add_argument(
         '--tlgrm-creds',
@@ -104,12 +111,63 @@ def detect_intent_texts(project_id: str,
     return response.query_result.fulfillment_text
 
 
+def train_dialog_flow(dialog_flow_id: str):
+    content = json.loads(
+        (pathlib.Path(__file__).parent / 'train.json').read_text()
+    )
+    for name, train_opts in content.items():
+        create_intent(
+            project_id=dialog_flow_id,
+            display_name=name,
+            training_phrases_parts=train_opts['questions'],
+            message_texts=(train_opts['answer'],),
+        )
+
+
+def create_intent(
+        project_id,
+        display_name,
+        training_phrases_parts,
+        message_texts,
+):
+    intents_client = dialogflow.IntentsClient()
+
+    parent = dialogflow.AgentsClient.agent_path(project_id)
+    training_phrases = []
+    for training_phrases_part in training_phrases_parts:
+        part = dialogflow.Intent.TrainingPhrase.Part(text=training_phrases_part)
+        training_phrase = dialogflow.Intent.TrainingPhrase(parts=[part])
+        training_phrases.append(training_phrase)
+
+    text = dialogflow.Intent.Message.Text(text=message_texts)
+    message = dialogflow.Intent.Message(text=text)
+
+    intent = dialogflow.Intent(
+        display_name=display_name,
+        training_phrases=training_phrases,
+        messages=[message],
+    )
+
+    response = intents_client.create_intent(
+        request={
+            "parent": parent,
+            "intent": intent,
+            "language_code": 'ru',
+        },
+    )
+
+    logger.debug("Intent created: {}".format(response))
+
+
 def main():
     options = parse_args()
     logging.basicConfig(level=logging.INFO)
     if options.debug:
         logging.basicConfig(level=logging.DEBUG)
 
+    if options.train_bot:
+        train_dialog_flow(options.dialog_flow_id)
+        return
     updater = Updater(token=options.tlgrm_creds)
     dispatcher = updater.dispatcher
 
