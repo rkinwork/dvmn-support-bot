@@ -82,7 +82,10 @@ def main():
         return
 
     if options.run_vk_bot:
-        vk_bot.run(token=options.vk_token)
+        vk_bot.run(
+            token=options.vk_token,
+            intent_detector=intent_detector,
+        )
 
 
 if __name__ == '__main__':
