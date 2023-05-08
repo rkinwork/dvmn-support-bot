@@ -59,7 +59,7 @@ def detect_intent_texts(project_id: str,
                         session_id: str,
                         text: str,
                         language_code: str
-                        ) -> str:
+                        ) -> (str, bool):
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path(project_id, session_id)
     logger.debug('Session path: {}'.format(session))
@@ -89,4 +89,4 @@ def detect_intent_texts(project_id: str,
         response.query_result.fulfillment_text,
     )
     )
-    return response.query_result.fulfillment_text
+    return response.query_result.fulfillment_text, response.query_result.intent.is_fallback

@@ -30,7 +30,7 @@ class Dialog:
         self._intent_detector = intent_detector
 
     def handler(self, update: Update, context: CallbackContext):
-        response = self._intent_detector(
+        response, _ = self._intent_detector(
             session_id=update.effective_user.id,
             text=update.message.text,
         )

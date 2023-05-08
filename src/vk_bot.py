@@ -13,15 +13,16 @@ def echo(vk_api, event):
 
 
 def bot(vk_api, event, intent_detector):
-    response = intent_detector(
+    response, is_fallback = intent_detector(
         session_id=event.user_id,
         text=event.text,
     )
-    vk_api.messages.send(
-        user_id=event.user_id,
-        message=response,
-        random_id=random.randint(1, 1000)
-    )
+    if not is_fallback:
+        vk_api.messages.send(
+            user_id=event.user_id,
+            message=response,
+            random_id=random.randint(1, 1000)
+        )
 
 
 def run(token: str, intent_detector):
