@@ -1,6 +1,6 @@
-# Devman Bot Lesson 2
+# Devman Bot Lesson 3
 
-This is study project for [lesson 2](https://dvmn.org/modules/chat-bots/lesson/support-bot/)
+This is study project for [lesson 3](https://dvmn.org/modules/chat-bots/lesson/support-bot/)
 Simple AI for decrease burden on users' support department
 
 ### Prerequisites
@@ -9,7 +9,11 @@ To start working with project you need to:
 
 - Installed [Git](https://git-scm.com/)
 - Installed [Docker Desktop](https://www.docker.com/)
+- DialogFlow [Register](https://cloud.google.com/dialogflow/es/docs/quick/setup) and
+  add [Agent](https://cloud.google.com/dialogflow/es/docs/quick/build-agent)
+- Get Dialog flow project id and credentials
 - [Register](https://telegram.me/BotFather) bot in telegram and get token
+- Obtain token for your VK group (Optional)
 
 ### Installing
 
@@ -19,23 +23,47 @@ Clone project
 git clone git@github.com:rkinwork/support-bot.git
 ```
 
+Create .env file and required environment variables from settings section to it.
+Put create `credentials.json` in project root and put there google auth private key
+
+Train you bot with script
+```bash
+make start_train
+```
+
+If you run this script once again it will end with error showing that you have already trained the model.
+If you want to train once again you should login and delete intents manually.
+
 ## Run service
 
-To start bot working
+To start telegram bot working
 
 ```bash
-make start
+make start_tg
 ```
 
 To stop bot working input in another console
 
+To start VK bot working
+
 ```bash
-make stop
+make start_vk
 ```
 
 ### Settings
 
-TBD
+| ENV variable                   | Description                          | Is Required? |
+|--------------------------------|--------------------------------------|--------------|
+| DVMN_BOT__DEBUG                | True or False to toggle debug mode   ||
+| DVMN_BOT__DIALOG_FLOW_ID       | id of the DiologFlow project         | True         |
+| DVMN_BOT__TELEGRAM_CREDS       | token of telegram bot                | True         |
+| DVMN_BOT__VK_CREDS             | token from your VK group             | True         |
+| DVMN_BOT__CHAT_ID              | telegram chat id of the admin user   | True         |
+| GOOGLE_APPLICATION_CREDENTIALS | path to your google credentials JSON | True         |
+
+## Check
+
+Look at `src/train.json` files. Try to send questions to the bot.  
 
 ## Authors
 

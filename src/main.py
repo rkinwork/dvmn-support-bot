@@ -22,18 +22,21 @@ def parse_args():
     group.add_argument(
         '--train-bot',
         help='run script in train mode. And terminate program',
+        env_var='DVMN_BOT__TRAIN_MODE',
         action='store_true',
     )
 
     group.add_argument(
         '--run-telegram-bot',
         help='run telegram bot',
+        env_var='DVMN_BOT__TELEGRAM_MODE',
         action='store_true',
     )
 
     group.add_argument(
         '--run-vk-bot',
         help='run vk bot',
+        env_var='DVMN_BOT__VK_MODE',
         action='store_true',
     )
 
@@ -51,6 +54,12 @@ def parse_args():
         '--dialog_flow_id',
         help='dialog flow project id',
         env_var='DVMN_BOT__DIALOG_FLOW_ID',
+        required=True,
+    )
+    parser.add_argument(
+        '--admin-chat-id',
+        help='telegram chat id',
+        env_var='DVMN_BOT__ADMIN_CHAT_ID',
         required=True,
     )
 
