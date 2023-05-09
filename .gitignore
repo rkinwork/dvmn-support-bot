@@ -61,3 +61,4 @@ celerybeat-schedule
 setup.cfg
 credentials.json
 .venv
+venv

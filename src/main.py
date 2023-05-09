@@ -7,7 +7,11 @@ import telegram_bot
 import dialog_flow
 import vk_bot
 
+from telegram_handler import TelegramHandler
+
+logging.basicConfig()
 logger = logging.getLogger(__name__)
+root_logger = logging.getLogger()
 
 
 def parse_args():
@@ -68,9 +72,16 @@ def parse_args():
 
 def main():
     options = parse_args()
-    logging.basicConfig(level=logging.INFO)
+    root_logger.setLevel(logging.INFO)
     if options.debug:
-        logging.basicConfig(level=logging.DEBUG)
+        root_logger.setLevel(logging.DEBUG)
+
+    th = TelegramHandler(
+        token=options.tg_token,
+        admin_chat_id=options.admin_chat_id,
+    )
+    th.setLevel(level=logging.ERROR)
+    root_logger.addHandler(th)
 
     df_id = options.dialog_flow_id
     if options.train_bot:
@@ -78,10 +89,10 @@ def main():
         return
 
     intent_detector = partial(
-                dialog_flow.detect_intent_texts,
-                project_id=df_id,
-                language_code='ru',
-            )
+        dialog_flow.detect_intent_texts,
+        project_id=df_id,
+        language_code='ru',
+    )
 
     if options.run_telegram_bot:
         telegram_bot.run(
@@ -91,10 +102,14 @@ def main():
         return
 
     if options.run_vk_bot:
-        vk_bot.run(
-            token=options.vk_token,
-            intent_detector=intent_detector,
-        )
+        try:
+            vk_bot.run(
+                token=options.vk_token,
+                intent_detector=intent_detector,
+            )
+        except Exception as e:
+            logger.error(msg=e)
+            raise
 
 
 if __name__ == '__main__':

@@ -21,6 +21,13 @@ def start(update: Update, context: CallbackContext) -> None:
     )
 
 
+def error_handler(update: object, context: CallbackContext) -> None:
+    logger.error(
+        msg="Exception while handling an update:",
+        exc_info=context.error,
+    )
+
+
 class Dialog:
     def __init__(
             self,
@@ -43,12 +50,12 @@ class Dialog:
 def run(token: str, intent_detector):
     updater = Updater(token=token)
     dispatcher = updater.dispatcher
-
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(
         MessageHandler(
             Filters.text & (~Filters.command),
             Dialog(intent_detector=intent_detector).handler),
     )
+    dispatcher.add_error_handler(error_handler)
     updater.start_polling()
     updater.idle()
