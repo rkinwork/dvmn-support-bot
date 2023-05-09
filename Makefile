@@ -14,8 +14,8 @@ stop:
 	docker-compose kill -s SIGINT
 
 run_server_tg:
-	export $(cat .env | xargs) && export DVMN_BOT__TELEGRAM_MODE=True && python src/main.py
+	export $$(cat .env | xargs) && export DVMN_BOT__TELEGRAM_MODE=True && /opt/dvmn-support-bot/venv/bin/python /opt/dvmn-support-bot/src/main.py
 
 run_server_vk:
-	export $(cat .env | xargs) && export DVMN_BOT__VK_MODE=True && python src/main.py
+	export $$(cat .env | xargs) && export DVMN_BOT__VK_MODE=True && /opt/dvmn-support-bot/venv/bin/python /opt/dvmn-support-bot/src/main.py
 
