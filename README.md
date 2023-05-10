@@ -3,6 +3,18 @@
 This is study project for [lesson 3](https://dvmn.org/modules/chat-bots/lesson/support-bot/)
 Simple AI for decrease burden on users' support department
 
+### Demo
+
+- [telegram bot](https://t.me/rkinwork_dvmn_support_bot)
+- [vk bot](https://vk.com/im?sel=-187412453)
+
+Send messages like:
+- Хочу работать у вас
+- Привет
+- Разбаньте
+
+for more questions look at `src/train.json` file.  
+
 ### Prerequisites
 
 To start working with project you need to:
@@ -20,7 +32,7 @@ To start working with project you need to:
 Clone project
 
 ```
-git clone git@github.com:rkinwork/support-bot.git
+git clone git@github.com:rkinwork/dvmn-support-bot.git
 ```
 
 Create .env file and required environment variables from settings section to it.
@@ -61,9 +73,6 @@ make start_vk
 | DVMN_BOT__CHAT_ID              | telegram chat id of the admin user   | True         |
 | GOOGLE_APPLICATION_CREDENTIALS | path to your google credentials JSON | True         |
 
-## Check
-
-Look at `src/train.json` files. Try to send questions to the bot.  
 
 ## Authors
 
