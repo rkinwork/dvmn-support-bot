@@ -10,7 +10,7 @@ VK_LISTEN_ATTEMPTS = 5
 VK_LISTEN_TIMEOUT = 60
 
 
-def bot(vk_api, event, intent_detector):
+def send_answer(vk_api, event, intent_detector):
     response, is_fallback = intent_detector(
         session_id=event.user_id,
         text=event.text,
@@ -41,8 +41,4 @@ def run(token: str, intent_detector):
             continue
         attempts_cnt = 0
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            bot(
-                vk_api=vk_api,
-                event=event,
-                intent_detector=intent_detector,
-            )
+            send_answer(vk_api=vk_api, event=event, intent_detector=intent_detector)
