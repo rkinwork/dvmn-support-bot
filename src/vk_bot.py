@@ -1,15 +1,13 @@
 import random
+import logging
 
+from urllib3.exceptions import ReadTimeoutError
 import vk_api as vk
 from vk_api.longpoll import VkLongPoll, VkEventType
 
-
-def echo(vk_api, event):
-    vk_api.messages.send(
-        user_id=event.user_id,
-        message=event.text,
-        random_id=random.randint(1, 1000)
-    )
+log = logging.getLogger(__name__)
+VK_LISTEN_ATTEMPTS = 5
+VK_LISTEN_TIMEOUT = 60
 
 
 def bot(vk_api, event, intent_detector):
@@ -21,16 +19,27 @@ def bot(vk_api, event, intent_detector):
         vk_api.messages.send(
             user_id=event.user_id,
             message=response,
-            random_id=random.randint(1, 1000)
+            random_id=random.randint(1, 1000),
         )
 
 
 def run(token: str, intent_detector):
     vk_session = vk.VkApi(token=token)
     vk_api = vk_session.get_api()
-    longpoll = VkLongPoll(vk_session)
 
-    for event in longpoll.listen():
+    events = VkLongPoll(vk_session).listen()
+    attempts_cnt = 0
+    while True:
+        try:
+            event = next(events)
+        except ReadTimeoutError as e:
+            if attempts_cnt > VK_LISTEN_ATTEMPTS:
+                log.warning('Attempts to get event from VK api finished')
+                raise e
+            log.warning('Problems with VK Long Polling API %s', e)
+            attempts_cnt += 1
+            continue
+        attempts_cnt = 0
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             bot(
                 vk_api=vk_api,
