@@ -1,4 +1,5 @@
 import logging
+import pathlib
 
 import configargparse
 
@@ -8,6 +9,8 @@ from dialog_flow import DialogFlow
 from telegram_handler import TelegramHandler
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_TRAIN_SOURCE = pathlib.Path(__file__).parent / 'train.json'
 
 
 def parse_args():
@@ -92,7 +95,10 @@ def main():
     )
 
     if options.train_bot:
-        dialog_flow.train()
+        train_source_path = DEFAULT_TRAIN_SOURCE
+        if options.train_path is not None:
+            train_source_path = pathlib.Path(options.train_path)
+        dialog_flow.train(train_source=train_source_path)
         return
 
     if options.run_telegram_bot:

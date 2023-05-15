@@ -1,15 +1,12 @@
-import os
 import logging
 
-from google.cloud import dialogflow
 from telegram import Update
-from telegram.ext import (
-    Updater,
-    CommandHandler,
-    MessageHandler,
-    Filters,
-    CallbackContext,
-)
+from telegram.ext import (CallbackContext,
+                          CommandHandler,
+                          Filters,
+                          MessageHandler,
+                          Updater,
+                          )
 
 logger = logging.getLogger(__name__)
 
@@ -23,21 +20,14 @@ def start(update: Update, context: CallbackContext) -> None:
 
 def error_handler(update: object, context: CallbackContext) -> None:
     logger.error(
-        msg="Exception while handling an update:",
+        msg='Exception while handling an update:',
         exc_info=context.error,
     )
 
 
-class Dialog:
-    def __init__(
-            self,
-            intent_detector,
-
-    ):
-        self._intent_detector = intent_detector
-
-    def handler(self, update: Update, context: CallbackContext):
-        response, _ = self._intent_detector(
+def get_dialog_handler(intent_detector):
+    def handler(update: Update, context: CallbackContext):
+        response, _ = intent_detector(
             session_id=update.effective_user.id,
             text=update.message.text,
         )
@@ -46,15 +36,18 @@ class Dialog:
             text=response,
         )
 
+    return handler
+
 
 def run(token: str, intent_detector):
     updater = Updater(token=token)
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(
         MessageHandler(
             Filters.text & (~Filters.command),
-            Dialog(intent_detector=intent_detector).handler),
+            get_dialog_handler(intent_detector),
+        ),
     )
     dispatcher.add_error_handler(error_handler)
     updater.start_polling()

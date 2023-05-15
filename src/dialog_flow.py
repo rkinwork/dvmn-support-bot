@@ -16,11 +16,9 @@ class DialogFlow:
         self._project_id = project_id
         self._language_code = language_code
 
-    def train(self):
-        content = json.loads(
-            (pathlib.Path(__file__).parent / 'train.json').read_text()
-        )
-        for name, train_opts in content.items():
+    def train(self, train_source: [str | pathlib.Path]):
+        train_cases = json.loads(pathlib.Path(train_source).read_text())
+        for name, train_opts in train_cases.items():
             self._create_intent(
                 display_name=name,
                 training_phrases_parts=train_opts['questions'],
@@ -29,11 +27,12 @@ class DialogFlow:
                 ),
             )
 
-    def _create_intent(self,
-                       display_name,
-                       training_phrases_parts,
-                       message_texts,
-                       ):
+    def _create_intent(
+            self,
+            display_name,
+            training_phrases_parts,
+            message_texts,
+    ):
         intents_client = dialogflow.IntentsClient()
 
         parent = dialogflow.AgentsClient.agent_path(self._project_id)
