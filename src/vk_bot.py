@@ -41,4 +41,8 @@ def run(token: str, intent_detector):
             continue
         attempts_cnt = 0
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            send_answer(vk_api=vk_api, event=event, intent_detector=intent_detector)
+            send_answer(
+                vk_api=vk_api,
+                event=event,
+                intent_detector=intent_detector,
+            )

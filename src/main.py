@@ -1,10 +1,9 @@
 import logging
-from functools import partial
 
 import configargparse
 
 import telegram_bot
-import dialog_flow
+from dialog_flow import DialogFlow
 import vk_bot
 
 from telegram_handler import TelegramHandler
@@ -83,21 +82,17 @@ def main():
     th.setLevel(level=logging.ERROR)
     root_logger.addHandler(th)
 
-    df_id = options.dialog_flow_id
-    if options.train_bot:
-        dialog_flow.train(df_id)
-        return
-
-    intent_detector = partial(
-        dialog_flow.detect_intent_texts,
-        project_id=df_id,
-        language_code='ru',
+    dialog_flow = DialogFlow(
+        project_id=options.dialog_flow_id,
     )
+    if options.train_bot:
+        dialog_flow.train()
+        return
 
     if options.run_telegram_bot:
         telegram_bot.run(
             token=options.tg_token,
-            intent_detector=intent_detector,
+            intent_detector=dialog_flow.detect_intent_texts,
         )
         return
 
@@ -105,7 +100,7 @@ def main():
         try:
             vk_bot.run(
                 token=options.vk_token,
-                intent_detector=intent_detector,
+                intent_detector=dialog_flow.detect_intent_texts,
             )
         except Exception as e:
             logger.error(msg=e)
