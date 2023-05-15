@@ -3,14 +3,11 @@ import logging
 import configargparse
 
 import telegram_bot
-from dialog_flow import DialogFlow
 import vk_bot
-
+from dialog_flow import DialogFlow
 from telegram_handler import TelegramHandler
 
-logging.basicConfig()
 logger = logging.getLogger(__name__)
-root_logger = logging.getLogger()
 
 
 def parse_args():
@@ -70,26 +67,36 @@ def parse_args():
 
 
 def main():
+    logging.basicConfig()
     options = parse_args()
+    root_logger = logging.getLogger()
     root_logger.setLevel(logging.INFO)
     if options.debug:
         root_logger.setLevel(logging.DEBUG)
 
-    th = TelegramHandler(
+    telegram_error_hndlr = TelegramHandler(
         token=options.tg_token,
         admin_chat_id=options.admin_chat_id,
     )
-    th.setLevel(level=logging.ERROR)
-    root_logger.addHandler(th)
+    telegram_error_hndlr.setLevel(level=logging.ERROR)
+    root_logger.addHandler(telegram_error_hndlr)
+    telegram_info_hndlr = TelegramHandler(
+        token=options.tg_token,
+        admin_chat_id=options.admin_chat_id,
+    )
+    telegram_info_hndlr.setLevel(level=logging.INFO)
+    logger.addHandler(hdlr=telegram_info_hndlr)
 
     dialog_flow = DialogFlow(
         project_id=options.dialog_flow_id,
     )
+
     if options.train_bot:
         dialog_flow.train()
         return
 
     if options.run_telegram_bot:
+        logger.info('Execution of telegram support started')
         telegram_bot.run(
             token=options.tg_token,
             intent_detector=dialog_flow.detect_intent_texts,
@@ -97,13 +104,14 @@ def main():
         return
 
     if options.run_vk_bot:
+        logger.info('Execution of vk support started')
         try:
             vk_bot.run(
                 token=options.vk_token,
                 intent_detector=dialog_flow.detect_intent_texts,
             )
-        except Exception as e:
-            logger.error(msg=e)
+        except Exception as exception:
+            logger.error(msg=exception)
             raise
 
 
