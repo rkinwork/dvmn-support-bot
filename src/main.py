@@ -66,6 +66,12 @@ def parse_args():
         required=True,
     )
 
+    parser.add_argument(
+        '--train-path',
+        help='custom training file path',
+        env_var='DVMN_BOT__TRAIN_PATH',
+    )
+
     return parser.parse_args()
 
 
