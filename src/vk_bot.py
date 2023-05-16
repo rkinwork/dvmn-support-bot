@@ -1,9 +1,9 @@
-import random
 import logging
+import random
 
-from urllib3.exceptions import ReadTimeoutError
 import vk_api as vk
 from vk_api.longpoll import VkLongPoll, VkEventType
+import requests
 
 log = logging.getLogger(__name__)
 VK_LISTEN_ATTEMPTS = 5
@@ -30,15 +30,19 @@ def run(token: str, intent_detector):
     events = VkLongPoll(vk_session).listen()
     attempts_cnt = 0
     while True:
+        attempts_cnt += 1
         try:
             event = next(events)
-        except ReadTimeoutError as e:
+        except (
+                requests.exceptions.ReadTimeout,
+                requests.exceptions.ConnectionError,
+        ) as api_except:
             if attempts_cnt > VK_LISTEN_ATTEMPTS:
                 log.warning('Attempts to get event from VK api finished')
-                raise e
-            log.warning('Problems with VK Long Polling API %s', e)
-            attempts_cnt += 1
+                raise api_except
+            log.warning('Problems with VK Long Polling API %s', api_except)
             continue
+
         attempts_cnt = 0
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             send_answer(
