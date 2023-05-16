@@ -26,8 +26,8 @@ def send_answer(vk_api, event, intent_detector):
 def run(token: str, intent_detector):
     vk_session = vk.VkApi(token=token)
     vk_api = vk_session.get_api()
-
-    events = VkLongPoll(vk_session).listen()
+    session = VkLongPoll(vk_session)
+    events = session.listen()
     attempts_cnt = 0
     while True:
         attempts_cnt += 1
@@ -41,6 +41,10 @@ def run(token: str, intent_detector):
                 log.warning('Attempts to get event from VK api finished')
                 raise api_except
             log.warning('Problems with VK Long Polling API %s', api_except)
+            continue
+        except StopIteration:
+            log.warning('restarting VK poller')
+            events = session.listen()
             continue
 
         attempts_cnt = 0
