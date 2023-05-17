@@ -1,5 +1,6 @@
 import logging
 import random
+import time
 
 import vk_api as vk
 from vk_api.longpoll import VkLongPoll, VkEventType
@@ -41,9 +42,7 @@ def run(token: str, intent_detector):
                 log.warning('Attempts to get event from VK api finished')
                 raise api_except
             log.warning('Problems with VK Long Polling API %s', api_except)
-            continue
-        except StopIteration:
-            log.warning('restarting VK poller')
+            time.sleep(VK_LISTEN_TIMEOUT)
             events = session.listen()
             continue
 
