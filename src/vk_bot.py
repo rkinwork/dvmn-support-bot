@@ -41,7 +41,11 @@ def run(token: str, intent_detector):
             if attempts_cnt > VK_LISTEN_ATTEMPTS:
                 log.warning('Attempts to get event from VK api finished')
                 raise api_except
-            log.warning('Problems with VK Long Polling API %s', api_except)
+            log.warning(
+                'Problems with VK Long Polling API: %n: %s',
+                attempts_cnt,
+                api_except,
+            )
             time.sleep(VK_LISTEN_TIMEOUT)
             events = session.listen()
             continue
